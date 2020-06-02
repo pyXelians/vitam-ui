@@ -36,7 +36,7 @@ db.customers.insert({
     zipCode: "{{ vitamui_platform_informations.address.zip_code }}",
     city: "{{ vitamui_platform_informations.address.city }}",
     country: "{{ vitamui_platform_informations.address.country }}"
-  }, 
+  },
   "graphicIdentity": {
     "hasCustomGraphicIdentity": true,
     "themeColors": {
@@ -937,6 +937,31 @@ db.profiles.insert({
   ]
 });
 
+db.profiles.insert({
+  "_id": "system_ingest_profile",
+  "identifier" : NumberInt(22),
+  "name": "Ingest Profile",
+  "description": "Ingest Profile",
+  "tenantIdentifier": NumberInt({{ vitamui_platform_informations.proof_tenant }}),
+  "applicationName": "INGEST_APP",
+  "level": "",
+  "enabled": true,
+  "readonly": false,
+  "customerId": "system_customer",
+  "roles": [
+  {
+    "name": "ROLE_CREATE_INGEST"
+  },
+  {
+    "name": "ROLE_GET_INGEST"
+  },
+  {
+    "name": "ROLE_GET_ALL_INGEST"
+  }
+   ]
+});
+
+
 // ========================================= GROUPS =========================================
 
 // ----------------------------------------- LEVEL "0" -----------------------------------------
@@ -967,7 +992,8 @@ db.groups.insert({
     "system_audit",
     "system_secure",
     "system_dsl",
-    "system_probative_value"
+    "system_probative_value",
+    "system_ingest_profile"
   ],
   "customerId": "system_customer"
 });
@@ -983,7 +1009,8 @@ db.groups.insert({
   "profileIds": [
     "system_customer_profile",
     "system_surrogate_profile",
-    "system_account_profile"
+    "system_account_profile",
+    "system_ingest_profile"
   ],
   "customerId": "system_customer"
 });

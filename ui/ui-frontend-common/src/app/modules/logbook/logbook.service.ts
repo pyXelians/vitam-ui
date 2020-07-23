@@ -36,8 +36,8 @@
  */
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { forkJoin, Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { forkJoin, Observable, of, throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 import { LogbookApiService } from '../api/logbook-api.service';
 import { Logger } from '../logger/logger';
@@ -128,6 +128,24 @@ export class LogbookService {
       map((response) => {
         return response.$results.reduce(flattenChildEvents, []).sort(sortEventByDate);
       })
+    );
+  }
+
+  getOperationById(id: string, tenantIdentifier: number, accessContractId: string): Observable<Event> {
+    const headers = new HttpHeaders({
+      'X-Tenant-Id': tenantIdentifier.toString(),
+      'X-Access-Contract-Id': accessContractId
+    });
+
+    return this.logbookApi.findOperationById(id, headers).pipe(
+      switchMap((response) => {
+        if (!response || !response.$results || response.$results.length === 0) {
+          return throwError(`getOperationById error: no result for operation with id ${id}`);
+        }
+
+        return of(response);
+      }),
+      map((response) => response.$results.length === 1 ? LogbookApiService.toEvent(response.$results[0]) : null)
     );
   }
 

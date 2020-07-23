@@ -39,6 +39,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { WINDOW_LOCATION } from './injection-tokens';
 import { AuthUser, Tenant } from './models';
+import {ApplicationId} from "./application-id.enum";
 
 @Injectable({
   providedIn: 'root'
@@ -106,6 +107,32 @@ export class AuthService {
     if (this._user) {
       const tenants = this._user.tenantsByApp.reduce((acc, x) => acc.concat(x.tenants), []);
       tenant = tenants.find((t) => t.identifier === identifier);
+    }
+
+    return tenant;
+  }
+
+  getTenantByAppAndIdentifier(appId: ApplicationId, tenantIdentifier: number): Tenant {
+    if (!this._user) {
+      console.error(`AuthService Error: user is null`);
+
+      return null;
+    }
+
+    const app = this._user.tenantsByApp.find((appTenants) => appTenants.name === appId);
+
+    if (!app) {
+      console.error(`AuthService Error: can\'t find application with id "${appId}"`);
+
+      return null;
+    }
+
+    const tenant = app.tenants.find((t) => t.identifier === tenantIdentifier);
+
+    if (!tenant) {
+      console.error(`AuthService Error: can\'t find tenant with id "${tenantIdentifier}"`);
+
+      return null;
     }
 
     return tenant;
